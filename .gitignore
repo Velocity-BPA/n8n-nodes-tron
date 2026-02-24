@@ -1,36 +1,13 @@
-# Dependencies
 node_modules/
-
-# Build output
 dist/
-
-# Source maps
-*.js.map
-
-# Logs
-*.log
-npm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE/Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Environment
 .env
 .env.local
-
-# Package artifacts
-*.tgz
-
-# Temporary
-*.tmp
-*.temp
-
-# Coverage
 coverage/
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.tgz
+*.tar.gz
+.nyc_output
+temp/
