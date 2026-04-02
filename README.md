@@ -8,25 +8,25 @@
 >
 > For licensing information, visit https://velobpa.com/licensing or contact licensing@velobpa.com.
 
-An n8n community node that provides comprehensive integration with the Tron blockchain network. This node offers 5 resources covering accounts, transactions, TRC20 tokens, blocks, and smart contracts, enabling developers to build powerful blockchain automation workflows with real-time data access and transaction capabilities.
+An n8n community node for interacting with the Tron blockchain network. This node provides access to 5 core resources with comprehensive operations for account management, transaction processing, TRC token interactions, block exploration, and smart contract operations.
 
 ![n8n Community Node](https://img.shields.io/badge/n8n-Community%20Node-blue)
 ![License](https://img.shields.io/badge/license-BSL--1.1-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
 ![Tron](https://img.shields.io/badge/Tron-TRX-red)
-![Blockchain](https://img.shields.io/badge/Blockchain-API-green)
-![TRC20](https://img.shields.io/badge/TRC20-Tokens-orange)
+![Blockchain](https://img.shields.io/badge/Blockchain-Web3-green)
+![DeFi](https://img.shields.io/badge/DeFi-Compatible-orange)
 
 ## Features
 
-- **Account Management** - Query account balances, resources, and transaction history across the Tron network
-- **Transaction Processing** - Create, broadcast, and monitor Tron transactions with full parameter control
-- **TRC20 Token Support** - Complete TRC20 token operations including transfers, balance queries, and contract interactions
-- **Block Explorer Functionality** - Access block data, transaction details, and network statistics in real-time
-- **Smart Contract Integration** - Deploy, interact with, and monitor smart contracts on the Tron blockchain
-- **Multi-Network Support** - Connect to Mainnet, Testnet (Nile), and custom Tron network endpoints
-- **Real-time Monitoring** - Track blockchain events and transaction confirmations with polling capabilities
-- **Energy Optimization** - Built-in energy and bandwidth management for cost-effective operations
+- **Account Operations** - Retrieve account information, balances, transaction history, and account resources
+- **Transaction Management** - Create, sign, broadcast, and monitor Tron network transactions
+- **TRC Token Support** - Full support for TRC-10 and TRC-20 token operations and transfers
+- **Block Explorer Functions** - Access block data, transaction details, and network statistics
+- **Smart Contract Integration** - Deploy, call, and interact with Tron smart contracts
+- **Real-time Network Data** - Get current network status, node information, and chain parameters
+- **Energy & Bandwidth Tracking** - Monitor and manage Tron network resource consumption
+- **Multi-signature Support** - Handle complex transaction signing scenarios
 
 ## Installation
 
@@ -61,132 +61,125 @@ n8n start
 
 | Field | Description | Required |
 |-------|-------------|----------|
-| API Key | Your Tron API key from TronGrid or TronScan | Yes |
-| Network | Target network (Mainnet, Testnet, Custom) | Yes |
-| API Endpoint | Custom API endpoint URL (when using Custom network) | No |
-| Rate Limit | Requests per second limit (default: 10) | No |
+| API Key | Your Tron API key for network access | Yes |
+| Network | Tron network (mainnet, shasta, nile) | Yes |
+| API Endpoint | Custom API endpoint URL (optional) | No |
 
 ## Resources & Operations
 
-### 1. Accounts
+### 1. Account
 
 | Operation | Description |
 |-----------|-------------|
-| Get Account | Retrieve account information including balance and resources |
-| Get Balance | Get TRX balance for a specific account |
-| Get Transactions | List transactions for an account with pagination |
-| Get Resources | Get bandwidth and energy information for an account |
+| Get Account Info | Retrieve detailed account information including balance and resources |
+| Get Account Balance | Get TRX balance for a specific account |
+| Get Account Resources | Check bandwidth and energy resources for an account |
+| Get Transaction History | Retrieve transaction history for an account |
+| Create Account | Create a new Tron account |
+| Update Account | Update account information |
 | Freeze Balance | Freeze TRX to gain bandwidth or energy |
 | Unfreeze Balance | Unfreeze previously frozen TRX |
 
-### 2. Transactions
+### 2. Transaction
 
 | Operation | Description |
 |-----------|-------------|
-| Create Transaction | Create a new transaction with specified parameters |
+| Get Transaction | Retrieve transaction details by transaction ID |
+| Create Transaction | Create a new transaction |
 | Sign Transaction | Sign a transaction with private key |
 | Broadcast Transaction | Broadcast a signed transaction to the network |
-| Get Transaction | Retrieve transaction details by hash |
-| Get Transaction Info | Get detailed transaction execution information |
-| Transfer TRX | Simple TRX transfer between accounts |
+| Get Transaction Receipt | Get transaction execution receipt and status |
+| Estimate Transaction Fee | Calculate estimated transaction fees |
+| Get Transaction List | Retrieve multiple transactions with filters |
+| Validate Transaction | Validate transaction format and signatures |
 
-### 3. Trc20Tokens
-
-| Operation | Description |
-|-----------|-------------|
-| Get Token Balance | Get TRC20 token balance for an account |
-| Transfer Tokens | Transfer TRC20 tokens between accounts |
-| Get Token Info | Retrieve token contract information and metadata |
-| Approve Tokens | Approve token spending allowance |
-| Get Allowance | Check approved token allowance amount |
-| Get Token Transactions | List token transfer transactions |
-
-### 4. Blocks
+### 3. TrcToken
 
 | Operation | Description |
 |-----------|-------------|
-| Get Block | Retrieve block information by number or hash |
-| Get Latest Block | Get the most recent block on the network |
-| Get Block Range | Get multiple blocks within a specified range |
-| Get Block Transactions | List all transactions in a specific block |
-| Get Network Stats | Get current network statistics and metrics |
+| Get Token Info | Retrieve TRC token information and metadata |
+| Get Token Balance | Check token balance for a specific account |
+| Transfer Token | Transfer TRC tokens between accounts |
+| Get Token Holders | List token holders and their balances |
+| Create Token | Create a new TRC-10 token |
+| Update Token | Update token parameters |
+| Get Token Transactions | Retrieve token transaction history |
+| Approve Token Spending | Approve token spending for TRC-20 tokens |
 
-### 5. SmartContracts
+### 4. Block
+
+| Operation | Description |
+|-----------|-------------|
+| Get Block | Retrieve block information by block number or hash |
+| Get Latest Block | Get the most recent block on the chain |
+| Get Block Range | Retrieve multiple blocks within a specified range |
+| Get Block Transactions | Get all transactions within a specific block |
+| Get Block Count | Get total number of blocks on the chain |
+| Get Block Producers | List current block producers and their status |
+| Get Network Info | Retrieve current network statistics and parameters |
+
+### 5. SmartContract
 
 | Operation | Description |
 |-----------|-------------|
 | Deploy Contract | Deploy a new smart contract to the Tron network |
 | Call Contract | Execute a smart contract function call |
-| Get Contract | Retrieve contract information and ABI |
-| Get Contract Events | Query contract events and logs |
-| Estimate Energy | Estimate energy consumption for contract calls |
-| Trigger Constant Contract | Call read-only contract functions |
+| Get Contract Info | Retrieve smart contract information and ABI |
+| Get Contract Events | Retrieve events emitted by smart contract |
+| Estimate Contract Call | Estimate energy cost for contract execution |
+| Trigger Constant Contract | Call contract view/pure functions |
+| Get Contract Code | Retrieve smart contract bytecode |
+| Validate Contract | Validate contract ABI and bytecode |
 
 ## Usage Examples
 
 ```javascript
-// Get account balance
-const accountInfo = {
-  "address": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
-  "balance": 1500000000,
-  "trc20": {
-    "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t": "1000000000"
-  }
-};
+// Get account information
+{
+  "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+  "visible": true
+}
+```
 
-// Transfer TRX between accounts
-const transferResult = {
-  "transaction": {
-    "txID": "7c2d4206c2276624aadc409a9d875e94de9c05e5e51e21f16f2b5d2c832d2e4e",
-    "raw_data": {
-      "contract": [{
-        "parameter": {
-          "value": {
-            "amount": 1000000,
-            "owner_address": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
-            "to_address": "TJCnKsPa7y5okkXvQAidZBzqx3QyQ6sxMW"
-          }
-        },
-        "type": "TransferContract"
-      }]
-    }
-  }
-};
+```javascript
+// Transfer TRX tokens
+{
+  "to_address": "TLPcGVErFdPDQjGUgkNedUzFc6nUhSS1Qx",
+  "amount": 1000000,
+  "from_address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+  "visible": true
+}
+```
 
-// Query TRC20 token balance
-const tokenBalance = {
-  "address": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
-  "contract_address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-  "balance": "1000000000",
-  "decimals": 6,
-  "symbol": "USDT"
-};
-
+```javascript
 // Get latest block information
-const blockInfo = {
-  "blockID": "0000000002b5fb8c1d7c4c8e6b5f4a1b2c3d4e5f6789abcdef0123456789abcdef",
-  "block_header": {
-    "raw_data": {
-      "number": 45678476,
-      "txTrieRoot": "0x9c47d1dfa5a5a3b8d9c7e0b8f2a1c5d6e8f4a2b7c9d1e6f8a3b5c7d9e0f2a4b6",
-      "parentHash": "0000000002b5fb8b7f2e4d1c9a8b5f3e6d2c5a8f4e1d7c3a9f6e2b8d5c1a7e4f",
-      "timestamp": 1640995200000
-    }
-  },
-  "transactions": []
-};
+{
+  "detail": true,
+  "visible": true
+}
+```
+
+```javascript
+// Call smart contract function
+{
+  "contract_address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+  "function_selector": "transfer(address,uint256)",
+  "parameter": "000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c0000000000000000000000000000000000000000000000000000000000000064",
+  "owner_address": "TLPcGVErFdPDQjGUgkNedUzFc6nUhSS1Qx",
+  "visible": true
+}
 ```
 
 ## Error Handling
 
 | Error | Description | Solution |
 |-------|-------------|----------|
-| `INVALID_ADDRESS` | Tron address format is incorrect | Verify address format (starts with T, 34 characters) |
-| `INSUFFICIENT_BALANCE` | Account lacks sufficient TRX or tokens | Check account balance before transaction |
-| `ENERGY_NOT_ENOUGH` | Insufficient energy for smart contract call | Freeze TRX for energy or use fee delegation |
-| `BANDWIDTH_NOT_ENOUGH` | Insufficient bandwidth for transaction | Wait for bandwidth regeneration or freeze TRX |
-| `API_RATE_LIMIT` | API request limit exceeded | Implement request throttling or upgrade API plan |
-| `CONTRACT_VALIDATE_ERROR` | Smart contract validation failed | Review contract parameters and ABI |
+| Invalid Address | Tron address format is incorrect | Verify address format and checksum |
+| Insufficient Balance | Account lacks sufficient TRX or energy | Check account balance and resources |
+| Contract Call Failed | Smart contract execution reverted | Review contract parameters and state |
+| Network Timeout | Request timed out waiting for response | Retry request or check network connectivity |
+| Invalid Transaction | Transaction format or signature invalid | Verify transaction structure and signing |
+| Rate Limit Exceeded | API rate limit has been exceeded | Implement request throttling or upgrade plan |
 
 ## Development
 
@@ -231,5 +224,5 @@ Contributions are welcome! Please ensure:
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/Velocity-BPA/n8n-nodes-tron/issues)
-- **Tron Documentation**: [Tron Developer Hub](https://developers.tron.network/)
-- **TronGrid API**: [TronGrid Documentation](https://www.trongrid.io/)
+- **Tron Documentation**: [developers.tron.network](https://developers.tron.network)
+- **Tron API Reference**: [tronapi.com](https://tronapi.com)
