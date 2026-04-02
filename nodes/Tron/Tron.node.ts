@@ -49,6 +49,26 @@ export class Tron implements INodeType {
         noDataExpression: true,
         options: [
           {
+            name: 'Account',
+            value: 'account',
+          },
+          {
+            name: 'Transaction',
+            value: 'transaction',
+          },
+          {
+            name: 'TrcToken',
+            value: 'trcToken',
+          },
+          {
+            name: 'Block',
+            value: 'block',
+          },
+          {
+            name: 'SmartContract',
+            value: 'smartContract',
+          },
+          {
             name: 'Accounts',
             value: 'accounts',
           },
@@ -69,9 +89,161 @@ export class Tron implements INodeType {
             value: 'smartContracts',
           }
         ],
-        default: 'accounts',
+        default: 'account',
       },
       // Operation dropdowns per resource
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: { show: { resource: ['account'] } },
+	options: [
+		{
+			name: 'Create Account',
+			value: 'createAccount',
+			description: 'Create a new TRON account',
+			action: 'Create account',
+		},
+		{
+			name: 'Get Account',
+			value: 'getAccount',
+			description: 'Get account information',
+			action: 'Get account',
+		},
+		{
+			name: 'Get Account Balance',
+			value: 'getAccountBalance',
+			description: 'Get account balance',
+			action: 'Get account balance',
+		},
+		{
+			name: 'Get Account Resource',
+			value: 'getAccountResource',
+			description: 'Get account resource information',
+			action: 'Get account resource',
+		},
+	],
+	default: 'createAccount',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['transaction'] } },
+  options: [
+    { name: 'Create Transaction', value: 'createTransaction', description: 'Create a TRX transfer transaction', action: 'Create a transaction' },
+    { name: 'Broadcast Transaction', value: 'broadcastTransaction', description: 'Broadcast a signed transaction', action: 'Broadcast a transaction' },
+    { name: 'Get Transaction by ID', value: 'getTransactionById', description: 'Get transaction details by ID', action: 'Get transaction by ID' },
+    { name: 'Get Transaction Info by ID', value: 'getTransactionInfoById', description: 'Get transaction info by ID', action: 'Get transaction info by ID' },
+    { name: 'Sign Transaction', value: 'signTransaction', description: 'Sign a transaction', action: 'Sign a transaction' },
+  ],
+  default: 'createTransaction',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+		},
+	},
+	options: [
+		{
+			name: 'Transfer TRC-10 Token',
+			value: 'transferTrc10',
+			description: 'Transfer TRC-10 tokens to another address',
+			action: 'Transfer TRC-10 token',
+		},
+		{
+			name: 'Trigger Smart Contract',
+			value: 'triggerSmartContract',
+			description: 'Interact with TRC-20 smart contracts',
+			action: 'Trigger smart contract',
+		},
+		{
+			name: 'Trigger Constant Contract',
+			value: 'triggerConstantContract',
+			description: 'Query TRC-20 contract data',
+			action: 'Trigger constant contract',
+		},
+		{
+			name: 'Get Asset List',
+			value: 'getAssetList',
+			description: 'Get list of TRC-10 tokens',
+			action: 'Get asset list',
+		},
+		{
+			name: 'Get Asset Issue by Account',
+			value: 'getAssetIssueByAccount',
+			description: 'Get assets issued by account',
+			action: 'Get asset issue by account',
+		},
+	],
+	default: 'transferTrc10',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['block'] } },
+  options: [
+    { name: 'Get Block', value: 'getBlock', description: 'Get block information by ID or number', action: 'Get block information' },
+    { name: 'Get Block by Number', value: 'getBlockByNumber', description: 'Get block by specific number', action: 'Get block by number' },
+    { name: 'Get Latest Block', value: 'getNowBlock', description: 'Get the latest block', action: 'Get latest block' },
+    { name: 'Get Block Balance', value: 'getBlockBalance', description: 'Get block balance operations', action: 'Get block balance' },
+    { name: 'Get Node Info', value: 'getNodeInfo', description: 'Get node information', action: 'Get node information' }
+  ],
+  default: 'getBlock',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+		},
+	},
+	options: [
+		{
+			name: 'Deploy Contract',
+			value: 'deployContract',
+			description: 'Deploy a smart contract',
+			action: 'Deploy a smart contract',
+		},
+		{
+			name: 'Trigger Smart Contract',
+			value: 'triggerSmartContract',
+			description: 'Execute smart contract function',
+			action: 'Execute smart contract function',
+		},
+		{
+			name: 'Trigger Constant Contract',
+			value: 'triggerConstantContract',
+			description: 'Call constant smart contract function',
+			action: 'Call constant smart contract function',
+		},
+		{
+			name: 'Get Contract',
+			value: 'getContract',
+			description: 'Get contract information',
+			action: 'Get contract information',
+		},
+		{
+			name: 'Get Contract Info',
+			value: 'getContractInfo',
+			description: 'Get detailed contract information',
+			action: 'Get detailed contract information',
+		},
+	],
+	default: 'deployContract',
+},
 {
   displayName: 'Operation',
   name: 'operation',
@@ -293,6 +465,530 @@ export class Tron implements INodeType {
   default: 'deployContract',
 },
       // Parameter definitions
+{
+	displayName: 'Owner Address',
+	name: 'ownerAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['createAccount'],
+		},
+	},
+	default: '',
+	description: 'The owner address of the account',
+},
+{
+	displayName: 'Account Address',
+	name: 'accountAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['createAccount'],
+		},
+	},
+	default: '',
+	description: 'The account address to create',
+},
+{
+	displayName: 'Address',
+	name: 'address',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccount', 'getAccountResource'],
+		},
+	},
+	default: '',
+	description: 'The account address to query',
+},
+{
+	displayName: 'Visible',
+	name: 'visible',
+	type: 'boolean',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccount', 'getAccountBalance', 'getAccountResource'],
+		},
+	},
+	default: true,
+	description: 'Whether the address is in base58 format',
+},
+{
+	displayName: 'Account Identifier',
+	name: 'accountIdentifier',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountBalance'],
+		},
+	},
+	default: '',
+	description: 'The account identifier',
+},
+{
+	displayName: 'Block Identifier',
+	name: 'blockIdentifier',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['account'],
+			operation: ['getAccountBalance'],
+		},
+	},
+	default: '',
+	description: 'The block identifier (optional)',
+},
+{
+  displayName: 'To Address',
+  name: 'toAddress',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['createTransaction'] } },
+  default: '',
+  description: 'Destination address for the transfer',
+},
+{
+  displayName: 'Owner Address',
+  name: 'ownerAddress',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['createTransaction'] } },
+  default: '',
+  description: 'Address of the transaction owner',
+},
+{
+  displayName: 'Amount',
+  name: 'amount',
+  type: 'number',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['createTransaction'] } },
+  default: 0,
+  description: 'Amount of TRX to transfer (in Sun, 1 TRX = 1,000,000 Sun)',
+},
+{
+  displayName: 'Visible',
+  name: 'visible',
+  type: 'boolean',
+  displayOptions: { show: { resource: ['transaction'], operation: ['createTransaction', 'getTransactionById'] } },
+  default: true,
+  description: 'Whether to show addresses in hex format',
+},
+{
+  displayName: 'Raw Data',
+  name: 'rawData',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['broadcastTransaction'] } },
+  default: '',
+  description: 'Raw transaction data to broadcast',
+},
+{
+  displayName: 'Signature',
+  name: 'signature',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['broadcastTransaction'] } },
+  default: '',
+  description: 'Transaction signature',
+},
+{
+  displayName: 'Transaction ID',
+  name: 'value',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['getTransactionById', 'getTransactionInfoById'] } },
+  default: '',
+  description: 'Transaction ID to query',
+},
+{
+  displayName: 'Transaction Object',
+  name: 'transaction',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['signTransaction'] } },
+  default: '',
+  description: 'Transaction object to sign (JSON string)',
+},
+{
+  displayName: 'Private Key',
+  name: 'privateKey',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['transaction'], operation: ['signTransaction'] } },
+  default: '',
+  description: 'Private key for signing the transaction',
+},
+{
+	displayName: 'Asset Name',
+	name: 'assetName',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['transferTrc10'],
+		},
+	},
+	default: '',
+	description: 'Name of the TRC-10 asset to transfer',
+},
+{
+	displayName: 'To Address',
+	name: 'toAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['transferTrc10'],
+		},
+	},
+	default: '',
+	description: 'Destination address for the transfer',
+},
+{
+	displayName: 'Owner Address',
+	name: 'ownerAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['transferTrc10', 'triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'Address of the token owner',
+},
+{
+	displayName: 'Amount',
+	name: 'amount',
+	type: 'number',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['transferTrc10'],
+		},
+	},
+	default: 0,
+	description: 'Amount of tokens to transfer',
+},
+{
+	displayName: 'Visible',
+	name: 'visible',
+	type: 'boolean',
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['transferTrc10', 'triggerSmartContract', 'triggerConstantContract', 'getAssetIssueByAccount'],
+		},
+	},
+	default: false,
+	description: 'Whether to use visible address format',
+},
+{
+	displayName: 'Contract Address',
+	name: 'contractAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'Address of the smart contract',
+},
+{
+	displayName: 'Function Selector',
+	name: 'functionSelector',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'Function selector for the smart contract call',
+},
+{
+	displayName: 'Parameter',
+	name: 'parameter',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'Parameters for the smart contract function',
+},
+{
+	displayName: 'Limit',
+	name: 'limit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['getAssetList'],
+		},
+	},
+	default: 20,
+	description: 'Maximum number of assets to return',
+},
+{
+	displayName: 'Offset',
+	name: 'offset',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['getAssetList'],
+		},
+	},
+	default: 0,
+	description: 'Number of assets to skip',
+},
+{
+	displayName: 'Address',
+	name: 'address',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['trcToken'],
+			operation: ['getAssetIssueByAccount'],
+		},
+	},
+	default: '',
+	description: 'Address to check for issued assets',
+},
+{
+  displayName: 'Block ID or Number',
+  name: 'idOrNum',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['block'], operation: ['getBlock'] } },
+  default: '',
+  description: 'Block ID (hash) or block number',
+},
+{
+  displayName: 'Detail',
+  name: 'detail',
+  type: 'boolean',
+  displayOptions: { show: { resource: ['block'], operation: ['getBlock'] } },
+  default: true,
+  description: 'Whether to return detailed information',
+},
+{
+  displayName: 'Visible',
+  name: 'visible',
+  type: 'boolean',
+  displayOptions: { show: { resource: ['block'], operation: ['getBlock', 'getBlockByNumber', 'getNowBlock', 'getBlockBalance'] } },
+  default: true,
+  description: 'Whether the address is in base58 format',
+},
+{
+  displayName: 'Block Number',
+  name: 'num',
+  type: 'number',
+  required: true,
+  displayOptions: { show: { resource: ['block'], operation: ['getBlockByNumber'] } },
+  default: 0,
+  description: 'Block number to retrieve',
+},
+{
+  displayName: 'Block Hash',
+  name: 'hash',
+  type: 'string',
+  displayOptions: { show: { resource: ['block'], operation: ['getBlockBalance'] } },
+  default: '',
+  description: 'Block hash for balance query',
+},
+{
+  displayName: 'Block Number',
+  name: 'number',
+  type: 'number',
+  displayOptions: { show: { resource: ['block'], operation: ['getBlockBalance'] } },
+  default: 0,
+  description: 'Block number for balance query',
+},
+{
+	displayName: 'ABI',
+	name: 'abi',
+	type: 'json',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: '',
+	description: 'The Application Binary Interface (ABI) of the smart contract',
+},
+{
+	displayName: 'Bytecode',
+	name: 'bytecode',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: '',
+	description: 'The compiled bytecode of the smart contract',
+},
+{
+	displayName: 'Constructor Parameters',
+	name: 'constructorParameters',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: '',
+	description: 'Constructor parameters for the smart contract',
+},
+{
+	displayName: 'Contract Name',
+	name: 'name',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: '',
+	description: 'Name of the smart contract',
+},
+{
+	displayName: 'Consume User Resource Percent',
+	name: 'consumeUserResourcePercent',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: 100,
+	description: 'Percentage of user resources to consume',
+},
+{
+	displayName: 'Origin Energy Limit',
+	name: 'originEnergyLimit',
+	type: 'number',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract'],
+		},
+	},
+	default: 1000000,
+	description: 'The maximum energy limit for the deployment',
+},
+{
+	displayName: 'Owner Address',
+	name: 'ownerAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract', 'triggerSmartContract', 'triggerConstantContract', 'getContract', 'getContractInfo'],
+		},
+	},
+	default: '',
+	description: 'The owner address of the contract',
+},
+{
+	displayName: 'Visible',
+	name: 'visible',
+	type: 'boolean',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['deployContract', 'triggerSmartContract', 'triggerConstantContract', 'getContract', 'getContractInfo'],
+		},
+	},
+	default: true,
+	description: 'Whether the address is in base58 format',
+},
+{
+	displayName: 'Contract Address',
+	name: 'contractAddress',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'The address of the smart contract',
+},
+{
+	displayName: 'Function Selector',
+	name: 'functionSelector',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'The function selector to call',
+},
+{
+	displayName: 'Parameter',
+	name: 'parameter',
+	type: 'string',
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['triggerSmartContract', 'triggerConstantContract'],
+		},
+	},
+	default: '',
+	description: 'Parameters for the function call',
+},
+{
+	displayName: 'Contract Value',
+	name: 'value',
+	type: 'string',
+	required: true,
+	displayOptions: {
+		show: {
+			resource: ['smartContract'],
+			operation: ['getContract', 'getContractInfo'],
+		},
+	},
+	default: '',
+	description: 'The contract address to query',
+},
 {
   displayName: 'Account Address',
   name: 'address',
@@ -841,6 +1537,16 @@ export class Tron implements INodeType {
     const resource = this.getNodeParameter('resource', 0) as string;
 
     switch (resource) {
+      case 'account':
+        return [await executeAccountOperations.call(this, items)];
+      case 'transaction':
+        return [await executeTransactionOperations.call(this, items)];
+      case 'trcToken':
+        return [await executeTrcTokenOperations.call(this, items)];
+      case 'block':
+        return [await executeBlockOperations.call(this, items)];
+      case 'smartContract':
+        return [await executeSmartContractOperations.call(this, items)];
       case 'accounts':
         return [await executeAccountsOperations.call(this, items)];
       case 'transactions':
@@ -861,143 +1567,144 @@ export class Tron implements INodeType {
 // Resource Handler Functions
 // ============================================================
 
-async function executeAccountsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
+async function executeAccountOperations(
+	this: IExecuteFunctions,
+	items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tronApi') as any;
+	const returnData: INodeExecutionData[] = [];
+	const operation = this.getNodeParameter('operation', 0) as string;
+	const credentials = await this.getCredentials('tronApi') as any;
 
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getAccount': {
-          const address = this.getNodeParameter('address', i) as string;
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/accounts/${address}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+	for (let i = 0; i < items.length; i++) {
+		try {
+			let result: any;
 
-        case 'getAccountTransactions': {
-          const address = this.getNodeParameter('address', i) as string;
-          const limit = this.getNodeParameter('limit', i, 20) as number;
-          const fingerprint = this.getNodeParameter('fingerprint', i, '') as string;
-          const searchInternal = this.getNodeParameter('searchInternal', i, false) as boolean;
+			switch (operation) {
+				case 'createAccount': {
+					const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+					const accountAddress = this.getNodeParameter('accountAddress', i) as string;
 
-          const queryParams: any = { limit };
-          if (fingerprint) queryParams.fingerprint = fingerprint;
-          if (searchInternal) queryParams.search_internal = searchInternal;
+					const body = {
+						owner_address: ownerAddress,
+						account_address: accountAddress,
+					};
 
-          const queryString = new URLSearchParams(queryParams).toString();
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/accounts/${address}/transactions?${queryString}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+					const options: any = {
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/createaccount`,
+						headers: {
+							'TRON-PRO-API-KEY': credentials.apiKey,
+							'Content-Type': 'application/json',
+						},
+						body,
+						json: true,
+					};
 
-        case 'getAccountTrc20Transactions': {
-          const address = this.getNodeParameter('address', i) as string;
-          const limit = this.getNodeParameter('limit', i, 20) as number;
-          const fingerprint = this.getNodeParameter('fingerprint', i, '') as string;
-          const contractAddress = this.getNodeParameter('contractAddress', i, '') as string;
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-          const queryParams: any = { limit };
-          if (fingerprint) queryParams.fingerprint = fingerprint;
-          if (contractAddress) queryParams.contract_address = contractAddress;
+				case 'getAccount': {
+					const address = this.getNodeParameter('address', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-          const queryString = new URLSearchParams(queryParams).toString();
-          
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/accounts/${address}/transactions/trc20?${queryString}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+					const body = {
+						address,
+						visible,
+					};
 
-        case 'getAccountInfo': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/getaccount`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              address: address,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+					const options: any = {
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/getaccount`,
+						headers: {
+							'TRON-PRO-API-KEY': credentials.apiKey,
+							'Content-Type': 'application/json',
+						},
+						body,
+						json: true,
+					};
 
-        case 'getAccountResource': {
-          const address = this.getNodeParameter('address', i) as string;
-          
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/getaccountresource`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              address: address,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
+				case 'getAccountBalance': {
+					const accountIdentifier = this.getNodeParameter('accountIdentifier', i) as string;
+					const blockIdentifier = this.getNodeParameter('blockIdentifier', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
+					const body: any = {
+						account_identifier: accountIdentifier,
+						visible,
+					};
 
-  return returnData;
+					if (blockIdentifier) {
+						body.block_identifier = blockIdentifier;
+					}
+
+					const options: any = {
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/getaccountbalance`,
+						headers: {
+							'TRON-PRO-API-KEY': credentials.apiKey,
+							'Content-Type': 'application/json',
+						},
+						body,
+						json: true,
+					};
+
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
+
+				case 'getAccountResource': {
+					const address = this.getNodeParameter('address', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
+
+					const body = {
+						address,
+						visible,
+					};
+
+					const options: any = {
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/getaccountresource`,
+						headers: {
+							'TRON-PRO-API-KEY': credentials.apiKey,
+							'Content-Type': 'application/json',
+						},
+						body,
+						json: true,
+					};
+
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
+
+				default:
+					throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
+			}
+
+			returnData.push({
+				json: result,
+				pairedItem: { item: i },
+			});
+		} catch (error: any) {
+			if (this.continueOnFail()) {
+				returnData.push({
+					json: { error: error.message },
+					pairedItem: { item: i },
+				});
+			} else {
+				throw new NodeApiError(this.getNode(), error);
+			}
+		}
+	}
+
+	return returnData;
 }
 
-async function executeTransactionsOperations(
+async function executeTransactionOperations(
   this: IExecuteFunctions,
   items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
@@ -1014,6 +1721,7 @@ async function executeTransactionsOperations(
           const toAddress = this.getNodeParameter('toAddress', i) as string;
           const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
           const amount = this.getNodeParameter('amount', i) as number;
+          const visible = this.getNodeParameter('visible', i) as boolean;
 
           const options: any = {
             method: 'POST',
@@ -1026,10 +1734,9 @@ async function executeTransactionsOperations(
               to_address: toAddress,
               owner_address: ownerAddress,
               amount: amount,
+              visible: visible,
             }),
-            json: true,
           };
-
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
@@ -1047,33 +1754,16 @@ async function executeTransactionsOperations(
             },
             body: JSON.stringify({
               raw_data: rawData,
-              signature: [signature],
+              signature: signature,
             }),
-            json: true,
           };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getTransaction': {
-          const hash = this.getNodeParameter('hash', i) as string;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/transactions/${hash}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-            },
-            json: true,
-          };
-
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
 
         case 'getTransactionById': {
           const value = this.getNodeParameter('value', i) as string;
+          const visible = this.getNodeParameter('visible', i) as boolean;
 
           const options: any = {
             method: 'POST',
@@ -1084,15 +1774,14 @@ async function executeTransactionsOperations(
             },
             body: JSON.stringify({
               value: value,
+              visible: visible,
             }),
-            json: true,
           };
-
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
 
-        case 'getTransactionInfo': {
+        case 'getTransactionInfoById': {
           const value = this.getNodeParameter('value', i) as string;
 
           const options: any = {
@@ -1105,9 +1794,27 @@ async function executeTransactionsOperations(
             body: JSON.stringify({
               value: value,
             }),
-            json: true,
           };
+          result = await this.helpers.httpRequest(options) as any;
+          break;
+        }
 
+        case 'signTransaction': {
+          const transaction = this.getNodeParameter('transaction', i) as string;
+          const privateKey = this.getNodeParameter('privateKey', i) as string;
+
+          const options: any = {
+            method: 'POST',
+            url: `${credentials.baseUrl}/wallet/gettransactionsign`,
+            headers: {
+              'TRON-PRO-API-KEY': credentials.apiKey,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              transaction: JSON.parse(transaction),
+              privateKey: privateKey,
+            }),
+          };
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
@@ -1129,175 +1836,165 @@ async function executeTransactionsOperations(
   return returnData;
 }
 
-async function executeTrc20TokensOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
+async function executeTrcTokenOperations(
+	this: IExecuteFunctions,
+	items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tronApi') as any;
+	const returnData: INodeExecutionData[] = [];
+	const operation = this.getNodeParameter('operation', 0) as string;
+	const credentials = await this.getCredentials('tronApi') as any;
 
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
+	for (let i = 0; i < items.length; i++) {
+		try {
+			let result: any;
 
-      switch (operation) {
-        case 'triggerSmartContract': {
-          const contractAddress = this.getNodeParameter('contractAddress', i) as string;
-          const functionSelector = this.getNodeParameter('functionSelector', i) as string;
-          const parameter = this.getNodeParameter('parameter', i) as string;
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+			const baseOptions: any = {
+				headers: {
+					'Content-Type': 'application/json',
+					'TRON-PRO-API-KEY': credentials.apiKey,
+				},
+				json: true,
+			};
 
-          const body: any = {
-            contract_address: contractAddress,
-            function_selector: functionSelector,
-            owner_address: ownerAddress,
-          };
+			switch (operation) {
+				case 'transferTrc10': {
+					const assetName = this.getNodeParameter('assetName', i) as string;
+					const toAddress = this.getNodeParameter('toAddress', i) as string;
+					const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+					const amount = this.getNodeParameter('amount', i) as number;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-          if (parameter) {
-            body.parameter = parameter;
-          }
+					const options: any = {
+						...baseOptions,
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/transferasset`,
+						body: {
+							asset_name: assetName,
+							to_address: toAddress,
+							owner_address: ownerAddress,
+							amount: amount,
+							visible: visible,
+						},
+					};
 
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/triggersmartcontract`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-          };
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+				case 'triggerSmartContract': {
+					const contractAddress = this.getNodeParameter('contractAddress', i) as string;
+					const functionSelector = this.getNodeParameter('functionSelector', i) as string;
+					const parameter = this.getNodeParameter('parameter', i) as string;
+					const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-        case 'getTrc20Transactions': {
-          const address = this.getNodeParameter('address', i) as string;
-          const contractAddress = this.getNodeParameter('contractAddress', i) as string;
-          const limit = this.getNodeParameter('limit', i) as number;
+					const options: any = {
+						...baseOptions,
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/triggersmartcontract`,
+						body: {
+							contract_address: contractAddress,
+							function_selector: functionSelector,
+							parameter: parameter,
+							owner_address: ownerAddress,
+							visible: visible,
+						},
+					};
 
-          let url = `${credentials.baseUrl}/v1/accounts/${address}/transactions/trc20`;
-          const queryParams: string[] = [];
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-          if (contractAddress) {
-            queryParams.push(`contract_address=${contractAddress}`);
-          }
-          if (limit) {
-            queryParams.push(`limit=${limit}`);
-          }
+				case 'triggerConstantContract': {
+					const contractAddress = this.getNodeParameter('contractAddress', i) as string;
+					const functionSelector = this.getNodeParameter('functionSelector', i) as string;
+					const parameter = this.getNodeParameter('parameter', i) as string;
+					const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-          if (queryParams.length > 0) {
-            url += '?' + queryParams.join('&');
-          }
+					const options: any = {
+						...baseOptions,
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/triggerconstantcontract`,
+						body: {
+							contract_address: contractAddress,
+							function_selector: functionSelector,
+							parameter: parameter,
+							owner_address: ownerAddress,
+							visible: visible,
+						},
+					};
 
-          const options: any = {
-            method: 'GET',
-            url,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-            },
-            json: true,
-          };
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+				case 'getAssetList': {
+					const limit = this.getNodeParameter('limit', i) as number;
+					const offset = this.getNodeParameter('offset', i) as number;
 
-        case 'constantCall': {
-          const contractAddress = this.getNodeParameter('contractAddress', i) as string;
-          const functionSelector = this.getNodeParameter('functionSelector', i) as string;
-          const parameter = this.getNodeParameter('parameter', i) as string;
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
+					const options: any = {
+						...baseOptions,
+						method: 'GET',
+						url: `${credentials.baseUrl}/v1/assets`,
+						qs: {
+							limit: limit,
+							offset: offset,
+						},
+					};
 
-          const body: any = {
-            contract_address: contractAddress,
-            function_selector: functionSelector,
-          };
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-          if (parameter) {
-            body.parameter = parameter;
-          }
-          if (ownerAddress) {
-            body.owner_address = ownerAddress;
-          }
+				case 'getAssetIssueByAccount': {
+					const address = this.getNodeParameter('address', i) as string;
+					const visible = this.getNodeParameter('visible', i) as boolean;
 
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/triggerconstantcontract`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-          };
+					const options: any = {
+						...baseOptions,
+						method: 'POST',
+						url: `${credentials.baseUrl}/wallet/getassetissuebyaccount`,
+						body: {
+							address: address,
+							visible: visible,
+						},
+					};
 
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
+					result = await this.helpers.httpRequest(options) as any;
+					break;
+				}
 
-        case 'getContract': {
-          const address = this.getNodeParameter('address', i) as string;
+				default:
+					throw new NodeOperationError(
+						this.getNode(),
+						`The operation "${operation}" is not known!`,
+						{
+							itemIndex: i,
+						},
+					);
+			}
 
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/contracts/${address}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-            },
-            json: true,
-          };
+			returnData.push({
+				json: result,
+				pairedItem: { item: i },
+			});
+		} catch (error: any) {
+			if (this.continueOnFail()) {
+				returnData.push({
+					json: { error: error.message },
+					pairedItem: { item: i },
+				});
+				continue;
+			}
+			throw new NodeApiError(this.getNode(), error);
+		}
+	}
 
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getContractTransactions': {
-          const address = this.getNodeParameter('address', i) as string;
-          const limit = this.getNodeParameter('limit', i) as number;
-
-          let url = `${credentials.baseUrl}/v1/contracts/${address}/transactions`;
-          if (limit) {
-            url += `?limit=${limit}`;
-          }
-
-          const options: any = {
-            method: 'GET',
-            url,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        if (error.response && error.response.body) {
-          throw new NodeApiError(this.getNode(), error.response.body);
-        }
-        throw new NodeOperationError(this.getNode(), error.message);
-      }
-    }
-  }
-
-  return returnData;
+	return returnData;
 }
 
-async function executeBlocksOperations(
+async function executeBlockOperations(
   this: IExecuteFunctions,
   items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
@@ -1308,232 +2005,51 @@ async function executeBlocksOperations(
   for (let i = 0; i < items.length; i++) {
     try {
       let result: any;
-      
+
       switch (operation) {
-        case 'getCurrentBlock': {
+        case 'getBlock': {
+          const idOrNum = this.getNodeParameter('idOrNum', i) as string;
+          const detail = this.getNodeParameter('detail', i) as boolean;
+          const visible = this.getNodeParameter('visible', i) as boolean;
+
+          const body: any = {
+            id_or_num: idOrNum,
+            detail,
+            visible,
+          };
+
           const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/wallet/getnowblock`,
+            method: 'POST',
+            url: `${credentials.baseUrl}/wallet/getblock`,
             headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
               'Content-Type': 'application/json',
+              'TRON-PRO-API-KEY': credentials.apiKey,
             },
+            body,
             json: true,
           };
+
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
-        
+
         case 'getBlockByNumber': {
           const num = this.getNodeParameter('num', i) as number;
+          const visible = this.getNodeParameter('visible', i) as boolean;
+
+          const body: any = {
+            num,
+            visible,
+          };
+
           const options: any = {
             method: 'POST',
             url: `${credentials.baseUrl}/wallet/getblockbynum`,
             headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
               'Content-Type': 'application/json',
-            },
-            body: {
-              num: num,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getBlockById': {
-          const value = this.getNodeParameter('value', i) as string;
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/getblockbyid`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: {
-              value: value,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getLatestBlocks': {
-          const limit = this.getNodeParameter('limit', i, 20) as number;
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/blocks/latest`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            qs: {
-              limit: limit,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getBlock': {
-          const identifier = this.getNodeParameter('identifier', i) as string;
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/blocks/${identifier}`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-      
-      returnData.push({
-        json: result,
-        pairedItem: { item: i },
-      });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-  
-  return returnData;
-}
-
-async function executeSmartContractsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const credentials = await this.getCredentials('tronApi') as any;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-
-      switch (operation) {
-        case 'deployContract': {
-          const abi = this.getNodeParameter('abi', i) as any;
-          const bytecode = this.getNodeParameter('bytecode', i) as string;
-          const constructorParameters = this.getNodeParameter('constructorParameters', i) as string;
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
-
-          const requestBody: any = {
-            abi: abi,
-            bytecode: bytecode,
-            owner_address: ownerAddress,
-          };
-
-          if (constructorParameters) {
-            requestBody.constructor_parameters = constructorParameters;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/deploycontract`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-            json: false,
-          };
-
-          const response = await this.helpers.httpRequest(options) as any;
-          result = JSON.parse(response);
-          break;
-        }
-
-        case 'callContract': {
-          const contractAddress = this.getNodeParameter('contractAddress', i) as string;
-          const functionSelector = this.getNodeParameter('functionSelector', i) as string;
-          const parameter = this.getNodeParameter('parameter', i) as string;
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
-
-          const requestBody: any = {
-            contract_address: contractAddress,
-            function_selector: functionSelector,
-            owner_address: ownerAddress,
-          };
-
-          if (parameter) {
-            requestBody.parameter = parameter;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/triggersmartcontract`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-            json: false,
-          };
-
-          const response = await this.helpers.httpRequest(options) as any;
-          result = JSON.parse(response);
-          break;
-        }
-
-        case 'callConstantContract': {
-          const contractAddress = this.getNodeParameter('contractAddress', i) as string;
-          const functionSelector = this.getNodeParameter('functionSelector', i) as string;
-          const parameter = this.getNodeParameter('parameter', i) as string;
-          const ownerAddress = this.getNodeParameter('ownerAddress', i) as string;
-
-          const requestBody: any = {
-            contract_address: contractAddress,
-            function_selector: functionSelector,
-            owner_address: ownerAddress,
-          };
-
-          if (parameter) {
-            requestBody.parameter = parameter;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: `${credentials.baseUrl}/wallet/triggerconstantcontract`,
-            headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-            json: false,
-          };
-
-          const response = await this.helpers.httpRequest(options) as any;
-          result = JSON.parse(response);
-          break;
-        }
-
-        case 'getContractInfo': {
-          const address = this.getNodeParameter('address', i) as string;
-
-          const options: any = {
-            method: 'GET',
-            url: `${credentials.baseUrl}/v1/contracts/${address}`,
-            headers: {
               'TRON-PRO-API-KEY': credentials.apiKey,
             },
+            body,
             json: true,
           };
 
@@ -1541,50 +2057,16 @@ async function executeSmartContractsOperations(
           break;
         }
 
-        case 'getContractData': {
-          const value = this.getNodeParameter('value', i) as string;
+        case 'getNowBlock': {
+          const visible = this.getNodeParameter('visible', i) as boolean;
 
-          const requestBody: any = {
-            value: value,
+          const body: any = {
+            visible,
           };
 
           const options: any = {
             method: 'POST',
-            url: `${credentials.baseUrl}/wallet/getcontract`,
+            url: `${credentials.baseUrl}/wallet/getnowblock`,
             headers: {
-              'TRON-PRO-API-KEY': credentials.apiKey,
               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-            json: false,
-          };
-
-          const response = await this.helpers.httpRequest(options) as any;
-          result = JSON.parse(response);
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(
-            this.getNode(),
-            `Unknown operation: ${operation}`,
-            { itemIndex: i }
-          );
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i }
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error, { itemIndex: i });
-      }
-    }
-  }
-
-  return returnData;
-}
+              'TRON-PRO-API-KEY': credentials.apiKey,
