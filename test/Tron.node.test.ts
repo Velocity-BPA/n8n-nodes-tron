@@ -67,600 +67,411 @@ describe('Tron Node', () => {
   });
 
   // Resource-specific tests
-describe('Accounts Resource', () => {
-  let mockExecuteFunctions: any;
+describe('Account Resource', () => {
+	let mockExecuteFunctions: any;
 
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://api.trongrid.io',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				apiKey: 'test-api-key',
+				baseUrl: 'https://api.trongrid.io',
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+			},
+		};
+	});
 
-  test('getAccount operation should return account information', async () => {
-    const mockResponse = {
-      data: [{
-        address: 'TRX9Uhjnw...',
-        balance: 1000000,
-        create_time: 1234567890,
-      }]
-    };
+	it('should create account successfully', async () => {
+		const mockResponse = { result: true, txid: 'test-txid' };
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('createAccount')
+			.mockReturnValueOnce('TOwnerAddress123')
+			.mockReturnValueOnce('TAccountAddress456');
 
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      if (param === 'operation') return 'getAccount';
-      if (param === 'address') return 'TRX9Uhjnw...';
-      return undefined;
-    });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+			method: 'POST',
+			url: 'https://api.trongrid.io/wallet/createaccount',
+			headers: {
+				'TRON-PRO-API-KEY': 'test-api-key',
+				'Content-Type': 'application/json',
+			},
+			body: {
+				owner_address: 'TOwnerAddress123',
+				account_address: 'TAccountAddress456',
+			},
+			json: true,
+		});
+		expect(result[0].json).toEqual(mockResponse);
+	});
 
-    const result = await executeAccountsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+	it('should get account successfully', async () => {
+		const mockResponse = { address: 'TTestAddress123', balance: 1000000 };
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccount')
+			.mockReturnValueOnce('TTestAddress123')
+			.mockReturnValueOnce(true);
 
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.trongrid.io/v1/accounts/TRX9Uhjnw...',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-        'Content-Type': 'application/json',
-      },
-      json: true,
-    });
-  });
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-  test('getAccountTransactions operation should return transaction history', async () => {
-    const mockResponse = {
-      data: [{
-        txID: '123abc...',
-        blockNumber: 12345,
-        timestamp: 1234567890,
-      }],
-      success: true,
-    };
+		expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+			method: 'POST',
+			url: 'https://api.trongrid.io/wallet/getaccount',
+			headers: {
+				'TRON-PRO-API-KEY': 'test-api-key',
+				'Content-Type': 'application/json',
+			},
+			body: {
+				address: 'TTestAddress123',
+				visible: true,
+			},
+			json: true,
+		});
+		expect(result[0].json).toEqual(mockResponse);
+	});
 
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number, defaultValue?: any) => {
-      if (param === 'operation') return 'getAccountTransactions';
-      if (param === 'address') return 'TRX9Uhjnw...';
-      if (param === 'limit') return defaultValue || 20;
-      if (param === 'fingerprint') return defaultValue || '';
-      if (param === 'searchInternal') return defaultValue || false;
-      return undefined;
-    });
+	it('should get account balance successfully', async () => {
+		const mockResponse = { balance: 5000000 };
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccountBalance')
+			.mockReturnValueOnce('TTestIdentifier123')
+			.mockReturnValueOnce('latest')
+			.mockReturnValueOnce(true);
 
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    const result = await executeAccountsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+		expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+			method: 'POST',
+			url: 'https://api.trongrid.io/wallet/getaccountbalance',
+			headers: {
+				'TRON-PRO-API-KEY': 'test-api-key',
+				'Content-Type': 'application/json',
+			},
+			body: {
+				account_identifier: 'TTestIdentifier123',
+				block_identifier: 'latest',
+				visible: true,
+			},
+			json: true,
+		});
+		expect(result[0].json).toEqual(mockResponse);
+	});
 
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.trongrid.io/v1/accounts/TRX9Uhjnw.../transactions?limit=20',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-        'Content-Type': 'application/json',
-      },
-      json: true,
-    });
-  });
+	it('should get account resource successfully', async () => {
+		const mockResponse = { EnergyUsed: 100, EnergyLimit: 1000 };
+		mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+		mockExecuteFunctions.getNodeParameter
+			.mockReturnValueOnce('getAccountResource')
+			.mockReturnValueOnce('TTestAddress123')
+			.mockReturnValueOnce(true);
 
-  test('getAccountInfo operation should return detailed account info', async () => {
-    const mockResponse = {
-      address: 'TRX9Uhjnw...',
-      balance: 1000000,
-      frozen: [{
-        frozen_balance: 100000,
-        expire_time: 1234567890,
-      }]
-    };
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      if (param === 'operation') return 'getAccountInfo';
-      if (param === 'address') return 'TRX9Uhjnw...';
-      return undefined;
-    });
+		expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+			method: 'POST',
+			url: 'https://api.trongrid.io/wallet/getaccountresource',
+			headers: {
+				'TRON-PRO-API-KEY': 'test-api-key',
+				'Content-Type': 'application/json',
+			},
+			body: {
+				address: 'TTestAddress123',
+				visible: true,
+			},
+			json: true,
+		});
+		expect(result[0].json).toEqual(mockResponse);
+	});
 
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+	it('should handle API errors gracefully', async () => {
+		const mockError = new Error('API Error');
+		mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(mockError);
+		mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getAccount');
+		mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-    const result = await executeAccountsOperations.call(mockExecuteFunctions, [{ json: {} }]);
+		const result = await executeAccountOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      url: 'https://api.trongrid.io/wallet/getaccount',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-        'Content-Type': 'application/json',
-      },
-      body: {
-        address: 'TRX9Uhjnw...',
-      },
-      json: true,
-    });
-  });
-
-  test('should handle API errors gracefully', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      if (param === 'operation') return 'getAccount';
-      if (param === 'address') return 'invalid-address';
-      return undefined;
-    });
-
-    const error = new Error('Invalid address format');
-    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(error);
-    mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-
-    const result = await executeAccountsOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].json.error).toBe('Invalid address format');
-  });
-
-  test('should throw error for unknown operation', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      if (param === 'operation') return 'unknownOperation';
-      return undefined;
-    });
-
-    await expect(
-      executeAccountsOperations.call(mockExecuteFunctions, [{ json: {} }])
-    ).rejects.toThrow('Unknown operation: unknownOperation');
-  });
+		expect(result[0].json.error).toBe('API Error');
+	});
 });
 
-describe('Transactions Resource', () => {
+describe('Transaction Resource', () => {
   let mockExecuteFunctions: any;
-
+  
   beforeEach(() => {
     mockExecuteFunctions = {
       getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://api.trongrid.io',
+      getCredentials: jest.fn().mockResolvedValue({ 
+        apiKey: 'test-key', 
+        baseUrl: 'https://api.trongrid.io' 
       }),
       getInputData: jest.fn().mockReturnValue([{ json: {} }]),
       getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
       continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
+      helpers: { 
+        httpRequest: jest.fn(), 
+        requestWithAuthentication: jest.fn() 
       },
     };
   });
 
-  describe('createTransaction', () => {
-    it('should create a TRX transfer transaction successfully', async () => {
-      const mockResponse = {
-        raw_data: {
-          contract: [{
-            parameter: {
-              value: {
-                amount: 1000000,
-                owner_address: '41e9d79cc47518930bc322d9bf7cddd260a0260a8d',
-                to_address: '41be38f617f18b2596ebe165de40670d03c8ec5b5e',
-              },
-            },
-          }],
-        },
-        txID: 'test-transaction-id',
-      };
+  it('should create transaction successfully', async () => {
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('createTransaction')
+      .mockReturnValueOnce('TRXToAddress123')
+      .mockReturnValueOnce('TRXFromAddress456')
+      .mockReturnValueOnce(1000000)
+      .mockReturnValueOnce(true);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        const params: any = {
-          operation: 'createTransaction',
-          toAddress: '41be38f617f18b2596ebe165de40670d03c8ec5b5e',
-          ownerAddress: '41e9d79cc47518930bc322d9bf7cddd260a0260a8d',
-          amount: 1000000,
-        };
-        return params[name];
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://api.trongrid.io/wallet/createtransaction',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          to_address: '41be38f617f18b2596ebe165de40670d03c8ec5b5e',
-          owner_address: '41e9d79cc47518930bc322d9bf7cddd260a0260a8d',
-          amount: 1000000,
-        }),
-        json: true,
-      });
-    });
-  });
-
-  describe('broadcastTransaction', () => {
-    it('should broadcast a signed transaction successfully', async () => {
-      const mockResponse = {
-        result: true,
-        txid: 'test-transaction-id',
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        const params: any = {
-          operation: 'broadcastTransaction',
-          rawData: 'test-raw-data',
-          signature: 'test-signature',
-        };
-        return params[name];
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
-
-  describe('getTransaction', () => {
-    it('should get transaction details by hash successfully', async () => {
-      const mockResponse = {
-        ret: [{ contractRet: 'SUCCESS' }],
-        signature: ['test-signature'],
-        txID: 'test-transaction-id',
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        const params: any = {
-          operation: 'getTransaction',
-          hash: 'test-hash',
-        };
-        return params[name];
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
-
-  describe('getTransactionById', () => {
-    it('should get transaction by ID successfully', async () => {
-      const mockResponse = {
-        ret: [{ contractRet: 'SUCCESS' }],
-        signature: ['test-signature'],
-        txID: 'test-transaction-id',
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        const params: any = {
-          operation: 'getTransactionById',
-          value: 'test-transaction-id',
-        };
-        return params[name];
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
-
-  describe('getTransactionInfo', () => {
-    it('should get transaction info successfully', async () => {
-      const mockResponse = {
-        id: 'test-transaction-id',
-        blockNumber: 12345,
-        receipt: {
-          energy_usage: 0,
-          net_usage: 267,
-          result: 'SUCCESS',
-        },
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        const params: any = {
-          operation: 'getTransactionInfo',
-          value: 'test-transaction-id',
-        };
-        return params[name];
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
-    });
-  });
-
-  describe('error handling', () => {
-    it('should handle API errors when continueOnFail is false', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        if (name === 'operation') return 'createTransaction';
-        return 'test-value';
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
-
-      const items = [{ json: {} }];
-
-      await expect(
-        executeTransactionsOperations.call(mockExecuteFunctions, items)
-      ).rejects.toThrow();
-    });
-
-    it('should continue on fail when continueOnFail is true', async () => {
-      mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-      mockExecuteFunctions.getNodeParameter.mockImplementation((name: string) => {
-        if (name === 'operation') return 'createTransaction';
-        return 'test-value';
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
-
-      const items = [{ json: {} }];
-      const result = await executeTransactionsOperations.call(mockExecuteFunctions, items);
-
-      expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
-    });
-  });
-});
-
-describe('Trc20Tokens Resource', () => {
-  let mockExecuteFunctions: any;
-
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://api.trongrid.io',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
-
-  test('triggerSmartContract should trigger TRC-20 contract successfully', async () => {
-    const mockResponse = { 
-      result: { result: true },
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      result: true,
       transaction: { txID: 'test-tx-id' }
-    };
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'triggerSmartContract';
-        case 'contractAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-        case 'functionSelector': return 'transfer(address,uint256)';
-        case 'parameter': return 'test-parameter';
-        case 'ownerAddress': return 'TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP';
-        default: return '';
-      }
     });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
     
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      url: 'https://api.trongrid.io/wallet/triggersmartcontract',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contract_address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-        function_selector: 'transfer(address,uint256)',
-        parameter: 'test-parameter',
-        owner_address: 'TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP',
-      }),
-    });
+    expect(result).toEqual([{ 
+      json: { result: true, transaction: { txID: 'test-tx-id' } }, 
+      pairedItem: { item: 0 } 
+    }]);
   });
 
-  test('getTrc20Transactions should get TRC-20 transactions successfully', async () => {
-    const mockResponse = { 
-      data: [
-        { transaction_id: 'tx1', value: '1000000' },
-        { transaction_id: 'tx2', value: '2000000' }
-      ]
-    };
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'getTrc20Transactions';
-        case 'address': return 'TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP';
-        case 'contractAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-        case 'limit': return 20;
-        default: return '';
-      }
+  it('should broadcast transaction successfully', async () => {
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('broadcastTransaction')
+      .mockReturnValueOnce('raw-data-string')
+      .mockReturnValueOnce('signature-string');
+
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      result: true,
+      message: 'Transaction broadcasted successfully'
     });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
     
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.trongrid.io/v1/accounts/TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP/transactions/trc20?contract_address=TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t&limit=20',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-      },
-      json: true,
-    });
+    expect(result).toEqual([{ 
+      json: { result: true, message: 'Transaction broadcasted successfully' }, 
+      pairedItem: { item: 0 } 
+    }]);
   });
 
-  test('constantCall should make constant call successfully', async () => {
-    const mockResponse = { 
-      result: { result: true },
-      constant_result: ['0000000000000000000000000000000000000000000000000000000000989680']
-    };
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'constantCall';
-        case 'contractAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-        case 'functionSelector': return 'balanceOf(address)';
-        case 'parameter': return 'test-parameter';
-        case 'ownerAddress': return 'TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP';
-        default: return '';
-      }
+  it('should get transaction by ID successfully', async () => {
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getTransactionById')
+      .mockReturnValueOnce('transaction-id-123')
+      .mockReturnValueOnce(true);
+
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue({
+      ret: [{ contractRet: 'SUCCESS' }],
+      signature: ['signature123']
     });
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
     
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      url: 'https://api.trongrid.io/wallet/triggerconstantcontract',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contract_address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-        function_selector: 'balanceOf(address)',
-        parameter: 'test-parameter',
-        owner_address: 'TLPamm8gjH7kPLjyENAdZoqJPSZc4ZfNxP',
-      }),
-    });
+    expect(result).toEqual([{ 
+      json: { ret: [{ contractRet: 'SUCCESS' }], signature: ['signature123'] }, 
+      pairedItem: { item: 0 } 
+    }]);
   });
 
-  test('getContract should get contract info successfully', async () => {
-    const mockResponse = { 
-      bytecode: '608060405234801561001057600080fd5b50',
-      name: 'TestToken',
-      consume_user_resource_percent: 30
-    };
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'getContract';
-        case 'address': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-        default: return '';
-      }
-    });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.trongrid.io/v1/contracts/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-      },
-      json: true,
-    });
-  });
-
-  test('getContractTransactions should get contract transactions successfully', async () => {
-    const mockResponse = { 
-      data: [
-        { transaction_id: 'tx1', block_timestamp: 1640995200000 },
-        { transaction_id: 'tx2', block_timestamp: 1640995260000 }
-      ]
-    };
-    
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'getContractTransactions';
-        case 'address': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-        case 'limit': return 20;
-        default: return '';
-      }
-    });
-    
-    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual(mockResponse);
-    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-      method: 'GET',
-      url: 'https://api.trongrid.io/v1/contracts/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t/transactions?limit=20',
-      headers: {
-        'TRON-PRO-API-KEY': 'test-api-key',
-      },
-      json: true,
-    });
-  });
-
-  test('should handle API errors', async () => {
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'getContract';
-        case 'address': return 'invalid-address';
-        default: return '';
-      }
-    });
-    
-    const mockError = new Error('API Error');
-    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(mockError);
-    
-    await expect(
-      executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }])
-    ).rejects.toThrow('API Error');
-  });
-
-  test('should continue on fail when enabled', async () => {
+  it('should handle errors gracefully when continueOnFail is true', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('createTransaction');
     mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-    mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-      switch (param) {
-        case 'operation': return 'getContract';
-        case 'address': return 'invalid-address';
-        default: return '';
-      }
-    });
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+
+    const result = await executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]);
     
-    const mockError = new Error('API Error');
-    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(mockError);
-    
-    const result = await executeTrc20TokensOperations.call(mockExecuteFunctions, [{ json: {} }]);
-    
-    expect(result).toHaveLength(1);
-    expect(result[0].json).toEqual({ error: 'API Error' });
+    expect(result).toEqual([{ 
+      json: { error: 'API Error' }, 
+      pairedItem: { item: 0 } 
+    }]);
+  });
+
+  it('should throw error when continueOnFail is false', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('createTransaction');
+    mockExecuteFunctions.continueOnFail.mockReturnValue(false);
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+
+    await expect(executeTransactionOperations.call(mockExecuteFunctions, [{ json: {} }]))
+      .rejects.toThrow('API Error');
   });
 });
 
-describe('Blocks Resource', () => {
+describe('TrcToken Resource', () => {
+	let mockExecuteFunctions: any;
+
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				apiKey: 'test-api-key',
+				baseUrl: 'https://api.trongrid.io',
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+			},
+		};
+	});
+
+	describe('transferTrc10', () => {
+		it('should transfer TRC-10 tokens successfully', async () => {
+			const mockResponse = { txID: 'mock-tx-id', result: true };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('transferTrc10')
+				.mockReturnValueOnce('TestToken')
+				.mockReturnValueOnce('TDestinationAddress')
+				.mockReturnValueOnce('TOwnerAddress')
+				.mockReturnValueOnce(1000)
+				.mockReturnValueOnce(false);
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+			expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+				headers: {
+					'Content-Type': 'application/json',
+					'TRON-PRO-API-KEY': 'test-api-key',
+				},
+				method: 'POST',
+				url: 'https://api.trongrid.io/wallet/transferasset',
+				body: {
+					asset_name: 'TestToken',
+					to_address: 'TDestinationAddress',
+					owner_address: 'TOwnerAddress',
+					amount: 1000,
+					visible: false,
+				},
+				json: true,
+			});
+		});
+
+		it('should handle transfer errors', async () => {
+			mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('transferTrc10');
+			mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('Transfer failed'));
+			mockExecuteFunctions.continueOnFail.mockReturnValue(true);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: { error: 'Transfer failed' }, pairedItem: { item: 0 } }]);
+		});
+	});
+
+	describe('triggerSmartContract', () => {
+		it('should trigger smart contract successfully', async () => {
+			const mockResponse = { result: { result: true } };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('triggerSmartContract')
+				.mockReturnValueOnce('TContractAddress')
+				.mockReturnValueOnce('transfer(address,uint256)')
+				.mockReturnValueOnce('0x123...')
+				.mockReturnValueOnce('TOwnerAddress')
+				.mockReturnValueOnce(true);
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+			expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+				headers: {
+					'Content-Type': 'application/json',
+					'TRON-PRO-API-KEY': 'test-api-key',
+				},
+				method: 'POST',
+				url: 'https://api.trongrid.io/wallet/triggersmartcontract',
+				body: {
+					contract_address: 'TContractAddress',
+					function_selector: 'transfer(address,uint256)',
+					parameter: '0x123...',
+					owner_address: 'TOwnerAddress',
+					visible: true,
+				},
+				json: true,
+			});
+		});
+	});
+
+	describe('triggerConstantContract', () => {
+		it('should trigger constant contract successfully', async () => {
+			const mockResponse = { constant_result: ['0x456...'] };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('triggerConstantContract')
+				.mockReturnValueOnce('TContractAddress')
+				.mockReturnValueOnce('balanceOf(address)')
+				.mockReturnValueOnce('0x789...')
+				.mockReturnValueOnce('TOwnerAddress')
+				.mockReturnValueOnce(false);
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+	});
+
+	describe('getAssetList', () => {
+		it('should get asset list successfully', async () => {
+			const mockResponse = { data: [{ id: '1000001', name: 'TestToken' }] };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('getAssetList')
+				.mockReturnValueOnce(10)
+				.mockReturnValueOnce(0);
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+			expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+				headers: {
+					'Content-Type': 'application/json',
+					'TRON-PRO-API-KEY': 'test-api-key',
+				},
+				method: 'GET',
+				url: 'https://api.trongrid.io/v1/assets',
+				qs: {
+					limit: 10,
+					offset: 0,
+				},
+				json: true,
+			});
+		});
+	});
+
+	describe('getAssetIssueByAccount', () => {
+		it('should get asset issue by account successfully', async () => {
+			const mockResponse = { assetIssue: [{ id: '1000001', name: 'MyToken' }] };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('getAssetIssueByAccount')
+				.mockReturnValueOnce('TAccountAddress')
+				.mockReturnValueOnce(true);
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
+
+			const items = [{ json: {} }];
+			const result = await executeTrcTokenOperations.call(mockExecuteFunctions, items);
+
+			expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+		});
+	});
+});
+
+describe('Block Resource', () => {
   let mockExecuteFunctions: any;
 
   beforeEach(() => {
@@ -668,458 +479,267 @@ describe('Blocks Resource', () => {
       getNodeParameter: jest.fn(),
       getCredentials: jest.fn().mockResolvedValue({
         apiKey: 'test-api-key',
-        baseUrl: 'https://api.trongrid.io',
+        baseUrl: 'https://api.trongrid.io'
       }),
       getInputData: jest.fn().mockReturnValue([{ json: {} }]),
       getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
       continueOnFail: jest.fn().mockReturnValue(false),
       helpers: {
         httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
+        requestWithAuthentication: jest.fn()
       },
     };
   });
 
-  describe('getCurrentBlock', () => {
-    it('should get current block successfully', async () => {
-      const mockResponse = {
-        blockID: '0000000002b1d9b1234567890abcdef1234567890abcdef1234567890abcdef12',
-        block_header: {
-          raw_data: {
-            number: 45481393,
-            txTrieRoot: '0x123',
-            witness_address: '41928c9af0651632157ef27a2cf17ca72c575a4d21',
-            parentHash: '0x456',
-            version: 22,
-            timestamp: 1671234567000,
-          },
-        },
-      };
+  it('should get block information successfully', async () => {
+    const mockResponse = { blockID: '123', blockNumber: 456 };
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getBlock')
+      .mockReturnValueOnce('123')
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true);
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getCurrentBlock';
-        return undefined;
-      });
+    const result = await executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://api.trongrid.io/wallet/getnowblock',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        json: true,
-      });
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://api.trongrid.io/wallet/getblock',
+      headers: {
+        'Content-Type': 'application/json',
+        'TRON-PRO-API-KEY': 'test-api-key',
+      },
+      body: { id_or_num: '123', detail: true, visible: true },
+      json: true,
     });
   });
 
-  describe('getBlockByNumber', () => {
-    it('should get block by number successfully', async () => {
-      const mockResponse = {
-        blockID: '0x123',
-        block_header: {
-          raw_data: {
-            number: 12345,
-            timestamp: 1671234567000,
-          },
-        },
-      };
+  it('should get block by number successfully', async () => {
+    const mockResponse = { blockNumber: 456, transactions: [] };
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getBlockByNumber')
+      .mockReturnValueOnce(456)
+      .mockReturnValueOnce(true);
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getBlockByNumber';
-        if (param === 'num') return 12345;
-        return undefined;
-      });
+    const result = await executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://api.trongrid.io/wallet/getblockbynum',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          num: 12345,
-        },
-        json: true,
-      });
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://api.trongrid.io/wallet/getblockbynum',
+      headers: {
+        'Content-Type': 'application/json',
+        'TRON-PRO-API-KEY': 'test-api-key',
+      },
+      body: { num: 456, visible: true },
+      json: true,
     });
   });
 
-  describe('getBlockById', () => {
-    it('should get block by ID successfully', async () => {
-      const mockResponse = {
-        blockID: '0x123abc',
-        block_header: {
-          raw_data: {
-            number: 12345,
-            timestamp: 1671234567000,
-          },
-        },
-      };
+  it('should get latest block successfully', async () => {
+    const mockResponse = { blockID: 'latest', blockNumber: 789 };
+    mockExecuteFunctions.getNodeParameter
+      .mockReturnValueOnce('getNowBlock')
+      .mockReturnValueOnce(true);
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getBlockById';
-        if (param === 'value') return '0x123abc';
-        return undefined;
-      });
+    const result = await executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'POST',
-        url: 'https://api.trongrid.io/wallet/getblockbyid',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        body: {
-          value: '0x123abc',
-        },
-        json: true,
-      });
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'https://api.trongrid.io/wallet/getnowblock',
+      headers: {
+        'Content-Type': 'application/json',
+        'TRON-PRO-API-KEY': 'test-api-key',
+      },
+      body: { visible: true },
+      json: true,
     });
   });
 
-  describe('getLatestBlocks', () => {
-    it('should get latest blocks successfully', async () => {
-      const mockResponse = {
-        data: [
-          { block_id: '0x123', number: 12345 },
-          { block_id: '0x124', number: 12346 },
-        ],
-        success: true,
-      };
+  it('should get node info successfully', async () => {
+    const mockResponse = { activeConnectCount: 10, passiveConnectCount: 5 };
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getNodeInfo');
+    mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getLatestBlocks';
-        if (param === 'limit') return 10;
-        return undefined;
-      });
+    const result = await executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://api.trongrid.io/v1/blocks/latest',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        qs: {
-          limit: 10,
-        },
-        json: true,
-      });
+    expect(result).toEqual([{ json: mockResponse, pairedItem: { item: 0 } }]);
+    expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://api.trongrid.io/wallet/getnodeinfo',
+      headers: {
+        'Content-Type': 'application/json',
+        'TRON-PRO-API-KEY': 'test-api-key',
+      },
+      json: true,
     });
   });
 
-  describe('getBlock', () => {
-    it('should get block by identifier successfully', async () => {
-      const mockResponse = {
-        blockID: '0x789',
-        block_header: {
-          raw_data: {
-            number: 67890,
-            timestamp: 1671234567000,
-          },
-        },
-      };
+  it('should handle API errors gracefully', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('getBlock');
+    mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('API Error'));
+    mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getBlock';
-        if (param === 'identifier') return '67890';
-        return undefined;
-      });
+    const result = await executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith({
-        method: 'GET',
-        url: 'https://api.trongrid.io/v1/blocks/67890',
-        headers: {
-          'TRON-PRO-API-KEY': 'test-api-key',
-          'Content-Type': 'application/json',
-        },
-        json: true,
-      });
-    });
+    expect(result).toEqual([{ json: { error: 'API Error' }, pairedItem: { item: 0 } }]);
   });
 
-  describe('error handling', () => {
-    it('should handle API errors', async () => {
-      const errorMessage = 'Block not found';
-      
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getCurrentBlock';
-        return undefined;
-      });
+  it('should throw error for unknown operation', async () => {
+    mockExecuteFunctions.getNodeParameter.mockReturnValueOnce('unknownOperation');
 
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error(errorMessage));
-
-      await expect(
-        executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow();
-    });
-
-    it('should continue on fail when enabled', async () => {
-      const errorMessage = 'Block not found';
-      
-      mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string, index: number) => {
-        if (param === 'operation') return 'getCurrentBlock';
-        return undefined;
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error(errorMessage));
-
-      const result = await executeBlocksOperations.call(mockExecuteFunctions, [{ json: {} }]);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual({ error: errorMessage });
-    });
+    await expect(executeBlockOperations.call(mockExecuteFunctions, [{ json: {} }])).rejects.toThrow('Unknown operation: unknownOperation');
   });
 });
 
-describe('SmartContracts Resource', () => {
-  let mockExecuteFunctions: any;
+describe('SmartContract Resource', () => {
+	let mockExecuteFunctions: any;
 
-  beforeEach(() => {
-    mockExecuteFunctions = {
-      getNodeParameter: jest.fn(),
-      getCredentials: jest.fn().mockResolvedValue({
-        apiKey: 'test-api-key',
-        baseUrl: 'https://api.trongrid.io',
-      }),
-      getInputData: jest.fn().mockReturnValue([{ json: {} }]),
-      getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
-      continueOnFail: jest.fn().mockReturnValue(false),
-      helpers: {
-        httpRequest: jest.fn(),
-        requestWithAuthentication: jest.fn(),
-      },
-    };
-  });
+	beforeEach(() => {
+		mockExecuteFunctions = {
+			getNodeParameter: jest.fn(),
+			getCredentials: jest.fn().mockResolvedValue({
+				apiKey: 'test-key',
+				baseUrl: 'https://api.trongrid.io',
+			}),
+			getInputData: jest.fn().mockReturnValue([{ json: {} }]),
+			getNode: jest.fn().mockReturnValue({ name: 'Test Node' }),
+			continueOnFail: jest.fn().mockReturnValue(false),
+			helpers: {
+				httpRequest: jest.fn(),
+			},
+		};
+	});
 
-  describe('deployContract', () => {
-    it('should deploy a smart contract successfully', async () => {
-      const mockResponse = {
-        result: { result: true },
-        transaction: { txID: '0x123' }
-      };
+	describe('deployContract operation', () => {
+		it('should deploy a smart contract successfully', async () => {
+			const mockResponse = { result: true, txid: '0x123' };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('deployContract')
+				.mockReturnValueOnce([{ type: 'constructor', inputs: [] }])
+				.mockReturnValueOnce('0x608060405234801561001057600080fd5b50')
+				.mockReturnValueOnce('')
+				.mockReturnValueOnce('TestContract')
+				.mockReturnValueOnce(100)
+				.mockReturnValueOnce(1000000)
+				.mockReturnValueOnce('TRX9Jv1vtun9VUgHQKQzaf1VF8fchrZsxHH')
+				.mockReturnValueOnce(true);
+			
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'deployContract';
-          case 'abi': return [{ "type": "constructor" }];
-          case 'bytecode': return '0x608060405234801561001057600080fd5b50';
-          case 'constructorParameters': return '';
-          case 'ownerAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-          default: return '';
-        }
-      });
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(JSON.stringify(mockResponse));
+			expect(result).toEqual([
+				{
+					json: mockResponse,
+					pairedItem: { item: 0 },
+				},
+			]);
+		});
 
-      const result = await executeSmartContractsOperations.call(
-        mockExecuteFunctions,
-        [{ json: {} }]
-      );
+		it('should handle deployment errors', async () => {
+			mockExecuteFunctions.getNodeParameter.mockReturnValue('deployContract');
+			mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('Deployment failed'));
+			mockExecuteFunctions.continueOnFail.mockReturnValue(true);
 
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          url: 'https://api.trongrid.io/wallet/deploycontract',
-        })
-      );
-    });
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-    it('should handle deployment errors', async () => {
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'deployContract';
-          case 'abi': return [{ "type": "constructor" }];
-          case 'bytecode': return '0x608060405234801561001057600080fd5b50';
-          case 'constructorParameters': return '';
-          case 'ownerAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-          default: return '';
-        }
-      });
+			expect(result[0].json.error).toBe('Deployment failed');
+		});
+	});
 
-      mockExecuteFunctions.helpers.httpRequest.mockRejectedValue(new Error('Deploy failed'));
+	describe('triggerSmartContract operation', () => {
+		it('should trigger smart contract function successfully', async () => {
+			const mockResponse = { result: { result: true }, transaction: { txid: '0x456' } };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('triggerSmartContract')
+				.mockReturnValueOnce('TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL')
+				.mockReturnValueOnce('transfer(address,uint256)')
+				.mockReturnValueOnce('0x000000000000000000000041')
+				.mockReturnValueOnce('TRX9Jv1vtun9VUgHQKQzaf1VF8fchrZsxHH')
+				.mockReturnValueOnce(true);
+			
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      await expect(
-        executeSmartContractsOperations.call(mockExecuteFunctions, [{ json: {} }])
-      ).rejects.toThrow();
-    });
-  });
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-  describe('callContract', () => {
-    it('should call contract function successfully', async () => {
-      const mockResponse = {
-        result: { result: true },
-        transaction: { txID: '0x456' }
-      };
+			expect(result).toEqual([
+				{
+					json: mockResponse,
+					pairedItem: { item: 0 },
+				},
+			]);
+		});
+	});
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'callContract';
-          case 'contractAddress': return '0x1234567890123456789012345678901234567890';
-          case 'functionSelector': return 'transfer(address,uint256)';
-          case 'parameter': return '0x000000000000000000000000123456789012345678901234567890123456789000000000000000000000000000000000000000000000000000000000000003e8';
-          case 'ownerAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-          default: return '';
-        }
-      });
+	describe('triggerConstantContract operation', () => {
+		it('should trigger constant contract function successfully', async () => {
+			const mockResponse = { constant_result: ['0x0000000000000000000000000000000000000000000000000000000000000064'] };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('triggerConstantContract')
+				.mockReturnValueOnce('TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL')
+				.mockReturnValueOnce('balanceOf(address)')
+				.mockReturnValueOnce('0x000000000000000000000041')
+				.mockReturnValueOnce('TRX9Jv1vtun9VUgHQKQzaf1VF8fchrZsxHH')
+				.mockReturnValueOnce(true);
+			
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(JSON.stringify(mockResponse));
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      const result = await executeSmartContractsOperations.call(
-        mockExecuteFunctions,
-        [{ json: {} }]
-      );
+			expect(result).toEqual([
+				{
+					json: mockResponse,
+					pairedItem: { item: 0 },
+				},
+			]);
+		});
+	});
 
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          url: 'https://api.trongrid.io/wallet/triggersmartcontract',
-        })
-      );
-    });
-  });
+	describe('getContract operation', () => {
+		it('should get contract information successfully', async () => {
+			const mockResponse = { bytecode: '0x608060405234801561001057600080fd5b50', name: 'TestContract' };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('getContract')
+				.mockReturnValueOnce('TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL')
+				.mockReturnValueOnce(true);
+			
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-  describe('callConstantContract', () => {
-    it('should call constant contract function successfully', async () => {
-      const mockResponse = {
-        result: { result: true },
-        constant_result: ['0x000000000000000000000000000000000000000000000000000000000000000a']
-      };
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'callConstantContract';
-          case 'contractAddress': return '0x1234567890123456789012345678901234567890';
-          case 'functionSelector': return 'balanceOf(address)';
-          case 'parameter': return '0x0000000000000000000000001234567890123456789012345678901234567890';
-          case 'ownerAddress': return 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-          default: return '';
-        }
-      });
+			expect(result).toEqual([
+				{
+					json: mockResponse,
+					pairedItem: { item: 0 },
+				},
+			]);
+		});
+	});
 
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(JSON.stringify(mockResponse));
+	describe('getContractInfo operation', () => {
+		it('should get detailed contract information successfully', async () => {
+			const mockResponse = { energy_usage: 65000, energy_usage_total: 65000 };
+			mockExecuteFunctions.getNodeParameter
+				.mockReturnValueOnce('getContractInfo')
+				.mockReturnValueOnce('TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL')
+				.mockReturnValueOnce(true);
+			
+			mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
 
-      const result = await executeSmartContractsOperations.call(
-        mockExecuteFunctions,
-        [{ json: {} }]
-      );
+			const result = await executeSmartContractOperations.call(mockExecuteFunctions, [{ json: {} }]);
 
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          url: 'https://api.trongrid.io/wallet/triggerconstantcontract',
-        })
-      );
-    });
-  });
-
-  describe('getContractInfo', () => {
-    it('should get contract information successfully', async () => {
-      const mockResponse = {
-        data: [{
-          address: '0x1234567890123456789012345678901234567890',
-          abi: { entrys: [] },
-          name: 'TestContract'
-        }]
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getContractInfo';
-          case 'address': return '0x1234567890123456789012345678901234567890';
-          default: return '';
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(mockResponse);
-
-      const result = await executeSmartContractsOperations.call(
-        mockExecuteFunctions,
-        [{ json: {} }]
-      );
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'GET',
-          url: 'https://api.trongrid.io/v1/contracts/0x1234567890123456789012345678901234567890',
-        })
-      );
-    });
-  });
-
-  describe('getContractData', () => {
-    it('should get contract data successfully', async () => {
-      const mockResponse = {
-        bytecode: '0x608060405234801561001057600080fd5b50',
-        name: 'TestContract',
-        origin_address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'
-      };
-
-      mockExecuteFunctions.getNodeParameter.mockImplementation((param: string) => {
-        switch (param) {
-          case 'operation': return 'getContractData';
-          case 'value': return '0x1234567890123456789012345678901234567890';
-          default: return '';
-        }
-      });
-
-      mockExecuteFunctions.helpers.httpRequest.mockResolvedValue(JSON.stringify(mockResponse));
-
-      const result = await executeSmartContractsOperations.call(
-        mockExecuteFunctions,
-        [{ json: {} }]
-      );
-
-      expect(result).toHaveLength(1);
-      expect(result[0].json).toEqual(mockResponse);
-      expect(mockExecuteFunctions.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          url: 'https://api.trongrid.io/wallet/getcontract',
-        })
-      );
-    });
-  });
+			expect(result).toEqual([
+				{
+					json: mockResponse,
+					pairedItem: { item: 0 },
+				},
+			]);
+		});
+	});
 });
 });
